@@ -1,0 +1,14 @@
+[
+  {
+    "name": "SalesforceCDCWebhook",
+    "directory": "src/functions/SalesforceCDCWebhook",
+    "scriptFile": "../SalesforceCDCWebhook.js",
+    "bindings": [
+      {
+        "name": "eventGridEvent",
+        "type": "eventGridTrigger",
+        "direction": "in"
+      }
+    ]
+  }
+]

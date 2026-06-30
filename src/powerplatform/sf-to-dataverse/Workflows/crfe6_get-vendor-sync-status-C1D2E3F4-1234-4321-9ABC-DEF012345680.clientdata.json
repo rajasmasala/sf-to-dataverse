@@ -1,0 +1,113 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "crfe6_sharedcommondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Salesforce ID",
+                  "description": "The 18-character Salesforce Account ID to look up via the crfe6_salesforceid alternate key.",
+                  "type": "string"
+                }
+              },
+              "required": ["text"]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_NotSynced_Response": {
+          "runAfter": {},
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "NotSyncedResponse",
+                "type": "object",
+                "value": {
+                  "found": false,
+                  "reason": "NotSynced",
+                  "message": "This vendor has not been synced to Dataverse yet."
+                }
+              }
+            ]
+          }
+        },
+        "Lookup_Vendor_By_Salesforce_Id": {
+          "runAfter": {
+            "Initialize_NotSynced_Response": ["Succeeded"]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "GetItem"
+            },
+            "parameters": {
+              "entityName": "accounts",
+              "recordId": "@triggerBody()?['text']",
+              "$select": "name,crfe6_uen,crfe6_salesforceid,crfe6_syncstatus,crfe6_lastmodifiedbyintegration_at,createdon"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Map_Status_To_Label": {
+          "runAfter": {
+            "Lookup_Vendor_By_Salesforce_Id": ["Succeeded"]
+          },
+          "type": "Compose",
+          "inputs": "@coalesce(body('Lookup_Vendor_By_Salesforce_Id')?['crfe6_syncstatus@OData.Community.Display.V1.FormattedValue'], 'Unknown')"
+        },
+        "Build_Success_Response": {
+          "runAfter": {
+            "Map_Status_To_Label": ["Succeeded"]
+          },
+          "type": "Compose",
+          "inputs": {
+            "found": true,
+            "vendorName": "@{body('Lookup_Vendor_By_Salesforce_Id')?['name']}",
+            "uen": "@{body('Lookup_Vendor_By_Salesforce_Id')?['crfe6_uen']}",
+            "salesforceId": "@{body('Lookup_Vendor_By_Salesforce_Id')?['crfe6_salesforceid']}",
+            "syncStatus": "@{outputs('Map_Status_To_Label')}",
+            "syncStatusCode": "@{coalesce(body('Lookup_Vendor_By_Salesforce_Id')?['crfe6_syncstatus'], -1)}",
+            "lastSyncAttempt": "@{coalesce(body('Lookup_Vendor_By_Salesforce_Id')?['crfe6_lastmodifiedbyintegration_at'], body('Lookup_Vendor_By_Salesforce_Id')?['createdon'])}"
+          }
+        },
+        "Respond_To_Agent": {
+          "runAfter": {
+            "Lookup_Vendor_By_Salesforce_Id": ["Succeeded", "Failed"]
+          },
+          "type": "Response",
+          "inputs": {
+            "statusCode": 200,
+            "body": "@if(equals(body('Lookup_Vendor_By_Salesforce_Id')?['accountid'], null), variables('NotSyncedResponse'), outputs('Build_Success_Response'))"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$authentication": {
+        "type": "Object",
+        "metadata": {
+          "description": "Authentication for the Dataverse connector"
+        }
+      }
+    }
+  }
+}

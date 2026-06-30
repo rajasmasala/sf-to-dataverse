@@ -1,0 +1,134 @@
+{
+  "name": "crfe6_get-vendor-sync-status",
+  "id": "/providers/Microsoft.PowerApps/apis/shared_flows/crfe6_get-vendor-sync-status",
+  "type": "Microsoft.PowerApps/apis",
+  "properties": {
+    "displayName": "Get Vendor Sync Status",
+    "description": "Called by the Copilot Studio vendor-Q&A agent. Looks up a single vendor Account in Dataverse by the crfe6_salesforceid alternate key (via List rows + $filter, because the Dataverse 'Get a row by ID' action resolves only the primary-key GUID, not alternate keys) and returns a structured result with the current sync state, UEN, and last integration timestamp. Returns a NotSynced payload (instead of throwing) when the vendor has never been synced, so the agent can phrase a friendly response.",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "PowerApp",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "Salesforce ID",
+                  "description": "The 18-character Salesforce Account ID to look up via the crfe6_salesforceid alternate key. If the user provides an Account Name or UEN instead, the Copilot Studio orchestrator is expected to resolve it first via the FindVendorsByStatus action.",
+                  "type": "string"
+                }
+              },
+              "required": ["text"]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_NotSynced_Response": {
+          "runAfter": {},
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "NotSyncedResponse",
+                "type": "object",
+                "value": {
+                  "found": false,
+                  "reason": "NotSynced",
+                  "message": "This vendor has not been synced to Dataverse yet. It either has no Salesforce ID on file, or no integration run has completed for it."
+                }
+              }
+            ]
+          }
+        },
+        "List_Vendor_By_Salesforce_Id": {
+          "runAfter": {
+            "Initialize_NotSynced_Response": ["Succeeded"]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "ListRecords"
+            },
+            "parameters": {
+              "entityName": "accounts",
+              "$filter": "crfe6_salesforceid eq '@{triggerBody()?['text']}'",
+              "$select": "accountid,name,crfe6_uen,crfe6_salesforceid,crfe6_syncstatus,crfe6_lastmodifiedbyintegration_at,createdon",
+              "$top": 1
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Select_First_Match": {
+          "runAfter": {
+            "List_Vendor_By_Salesforce_Id": ["Succeeded"]
+          },
+          "type": "Compose",
+          "inputs": "@first(body('List_Vendor_By_Salesforce_Id')?['value'])"
+        },
+        "Map_Status_To_Label": {
+          "runAfter": {
+            "Select_First_Match": ["Succeeded"]
+          },
+          "type": "Compose",
+          "inputs": "@coalesce(outputs('Select_First_Match')?['crfe6_syncstatus@OData.Community.Display.V1.FormattedValue'], 'Unknown')"
+        },
+        "Build_Success_Response": {
+          "runAfter": {
+            "Map_Status_To_Label": ["Succeeded"]
+          },
+          "type": "Compose",
+          "inputs": {
+            "found": true,
+            "vendorName": "@{outputs('Select_First_Match')?['name']}",
+            "uen": "@{outputs('Select_First_Match')?['crfe6_uen']}",
+            "salesforceId": "@{outputs('Select_First_Match')?['crfe6_salesforceid']}",
+            "syncStatus": "@{outputs('Map_Status_To_Label')}",
+            "syncStatusCode": "@{coalesce(outputs('Select_First_Match')?['crfe6_syncstatus'], -1)}",
+            "lastSyncAttempt": "@{coalesce(outputs('Select_First_Match')?['crfe6_lastmodifiedbyintegration_at'], outputs('Select_First_Match')?['createdon'])}",
+            "dataverseUrl": "https://@{workflow().tags.environmentName}/main.aspx?appid=@{workflow().tags.appId}&pagetype=entityrecord&etn=account&id=@{outputs('Select_First_Match')?['accountid']}"
+          }
+        },
+        "Respond_To_Agent": {
+          "runAfter": {
+            "Build_Success_Response": ["Succeeded"]
+          },
+          "type": "Response",
+          "inputs": {
+            "statusCode": 200,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "found": { "type": "boolean" },
+                "vendorName": { "type": "string" },
+                "uen": { "type": "string" },
+                "salesforceId": { "type": "string" },
+                "syncStatus": { "type": "string" },
+                "syncStatusCode": { "type": "integer" },
+                "lastSyncAttempt": { "type": "string" },
+                "dataverseUrl": { "type": "string" },
+                "reason": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            },
+            "body": "@if(empty(coalesce(body('List_Vendor_By_Salesforce_Id')?['value'], json('[]'))), variables('NotSyncedResponse'), outputs('Build_Success_Response'))"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$authentication": {
+        "type": "Object",
+        "metadata": {
+          "description": "Authentication for the Dataverse connector (shared_commondataserviceforapps)."
+        }
+      }
+    }
+  }
+}

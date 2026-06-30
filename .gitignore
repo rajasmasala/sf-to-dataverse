@@ -1,0 +1,44 @@
+node_modules/
+.env
+.env.local
+repomix-output.xml
+local.settings.json
+src/azure/.azurite/
+coverage/
+
+# E2E deploy artifacts (one-shot cloud deploy scratch — not committed)
+.deploy-staging/
+.deploy-blob-url.txt
+.deploy-state.ps1
+azure-function.zip
+src/azure/host.deploy.json
+
+# Salesforce CLI cache
+.sf/
+
+# .NET build output (UniversalFabric.Plugins + future dotnet projects)
+**/bin/
+**/obj/
+
+# Power Platform pack output
+out/
+src/powerplatform/**/*.zip
+.tmp-commit-msg.txt
+.tmp-pr-body.md
+
+# Local harness / engine artifacts — keep out of this repo
+.harness/
+.vh-doctor.sh
+scripts/harness.py
+docs/vh-*.md
+
+# Salesforce DX local state
+.sfdx/
+
+# Binary / generated artifacts (ship runbooks instead, per ADRs 0010/0011)
+*.pbix
+*.msapp
+/*.pdf
+
+# Local scratch (not project source)
+tmp/

@@ -1,0 +1,201 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Universal Fabric Vendor Status",
+    "description": "Read-only access to the Salesforce-mirrored vendor sync state in Dataverse. Used by the Copilot Studio vendor-Q&A agent to answer questions like 'what is the sync status of vendor X?' or 'which vendors failed to sync?'",
+    "version": "1.1.0.0",
+    "contact": {
+      "name": "SF to Dataverse PoC",
+      "url": "https://github.com/rajasmasala/sf-to-dataverse"
+    }
+  },
+  "host": "org.api.crm5.dynamics.com",
+  "basePath": "/api/data/v9.2",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/authorize",
+      "tokenUrl": "https://login.microsoftonline.com/common/oauth2/token",
+      "scopes": {
+        "user_impersonation": "Have full access to the Dataverse environment on behalf of the signed-in user."
+      }
+    }
+  },
+  "security": [{ "oauth2": ["user_impersonation"] }],
+  "x-ms-capabilities": {
+    "protectionScenario": "oauth2"
+  },
+  "paths": {
+    "/accounts(crfe6_salesforceid='{salesforceId}')": {
+      "get": {
+        "summary": "Get vendor sync status by Salesforce ID",
+        "description": "Returns the current sync state of a single vendor Account identified by its Salesforce record ID (alternate key lookup via crfe6_salesforceid). The crfe6_syncstatus field is stamped by the Azure Function on every successful sync attempt.",
+        "operationId": "GetVendorSyncStatus",
+        "x-ms-visibility": "important",
+        "x-ms-summary": "Get vendor sync status",
+        "parameters": [
+          {
+            "name": "salesforceId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "maxLength": 100,
+            "x-ms-summary": "Salesforce ID",
+            "x-ms-visibility": "important",
+            "description": "The 18-character Salesforce Account ID (e.g. 001D000000I8aWY). This is the alternate key used to upsert the vendor row in Dataverse."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The vendor was found. The body contains the sync-relevant projection of the Account row.",
+            "schema": { "$ref": "#/definitions/VendorSyncStatus" }
+          },
+          "404": {
+            "description": "No Account row exists with the given crfe6_salesforceid alternate key. The vendor has never been synced to Dataverse.",
+            "schema": { "$ref": "#/definitions/Error" }
+          }
+        },
+        "x-ms-actions": {
+          "fallbackResponse": {
+            "description": "Returns a NotSynced payload when the underlying call returns 404, so the agent can phrase a friendly answer instead of surfacing the raw HTTP error."
+          }
+        }
+      }
+    },
+    "/accounts": {
+      "get": {
+        "summary": "Find vendors by sync state",
+        "description": "Returns Account rows filtered by crfe6_syncstatus (Pending / Synced / Error). Use this when the user asks open-ended questions like 'which vendors failed to sync recently?' or 'show me pending vendors'. Sorted by createdon descending so the most recent activity appears first.",
+        "operationId": "FindVendorsByStatus",
+        "x-ms-visibility": "advanced",
+        "x-ms-summary": "Find vendors by sync status",
+        "parameters": [
+          {
+            "name": "$filter",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "x-ms-summary": "OData filter",
+            "x-ms-visibility": "advanced",
+            "default": "crfe6_syncstatus eq 100000001",
+            "description": "OData $filter against the account entity. Pass crfe6_syncstatus eq 100000000 for Pending, 100000001 for Synced, 100000002 for Error.",
+            "x-ms-enum-values": [
+              { "value": "crfe6_syncstatus eq 100000000", "displayName": "Pending" },
+              { "value": "crfe6_syncstatus eq 100000001", "displayName": "Synced" },
+              { "value": "crfe6_syncstatus eq 100000002", "displayName": "Error" }
+            ]
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100,
+            "x-ms-summary": "Max results",
+            "description": "Cap on number of rows returned. Defaults to 20 to keep agent responses readable."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of vendor rows matching the requested sync status.",
+            "schema": { "$ref": "#/definitions/VendorSyncStatusPage" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "VendorSyncStatus": {
+      "type": "object",
+      "properties": {
+        "accountid": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Dataverse primary key for the Account row.",
+          "x-ms-permission": "read-only"
+        },
+        "name": {
+          "type": "string",
+          "description": "Vendor display name, mirrored from the Salesforce Account.Name field.",
+          "x-ms-summary": "Vendor name",
+          "x-ms-permission": "read-only"
+        },
+        "crfe6_uen": {
+          "type": "string",
+          "description": "Singapore UEN (ACRA identifier), mirrored from the Salesforce UEN__c field.",
+          "x-ms-summary": "UEN",
+          "x-ms-permission": "read-only"
+        },
+        "crfe6_salesforceid": {
+          "type": "string",
+          "description": "18-character Salesforce Account ID. Alternate key for idempotent upsert.",
+          "x-ms-summary": "Salesforce ID",
+          "x-ms-permission": "read-only"
+        },
+        "crfe6_syncstatus": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Option set: 100000000=Pending, 100000001=Synced, 100000002=Error. Stamped by the Azure Function: Synced on a successful upsert, Error on a failed attempt (best-effort, update-only).",
+          "x-ms-summary": "Sync status",
+          "enum": [100000000, 100000001, 100000002],
+          "x-ms-enum": "syncstatus",
+          "x-ms-permission": "read-only"
+        },
+        "crfe6_syncstatus@OData.Community.Display.V1.FormattedValue": {
+          "type": "string",
+          "description": "Localized label of crfe6_syncstatus (e.g. 'Synced'). Always use this in agent responses to users.",
+          "x-ms-summary": "Sync status (label)",
+          "x-ms-permission": "read-only"
+        },
+        "crfe6_lastmodifiedbyintegration_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC timestamp of the last integration-side write. Stamped by the Azure Function on every successful sync (and also by the AccountUpdateStampPlugin when that plugin is registered).",
+          "x-ms-summary": "Last sync attempt",
+          "x-ms-permission": "read-only"
+        },
+        "createdon": {
+          "type": "string",
+          "format": "date-time",
+          "description": "UTC timestamp of when the row was first created in Dataverse.",
+          "x-ms-summary": "Created on",
+          "x-ms-permission": "read-only"
+        }
+      },
+      "required": ["accountid", "name"]
+    },
+    "VendorSyncStatusPage": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/VendorSyncStatus" },
+          "description": "The requested page of vendor rows."
+        },
+        "@odata.nextLink": {
+          "type": "string",
+          "description": "Link to the next page of results if more rows match the filter. The agent should not follow this automatically — surface a summary count instead."
+        }
+      },
+      "required": ["value"]
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": { "type": "string" },
+            "message": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

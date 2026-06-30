@@ -1,0 +1,92 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.1.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-managed-solution:
+    name: Build Managed Dataverse Solution
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Install PAC CLI
+        # microsoft/powerplatform-actions/actions-install v1.9.2
+        uses: microsoft/powerplatform-actions/actions-install@0e44beb5424af932af47250a2568eba4c259e3d8
+
+      - name: Pack Managed Solution
+        # microsoft/powerplatform-actions/pack-solution v1.9.2
+        uses: microsoft/powerplatform-actions/pack-solution@0e44beb5424af932af47250a2568eba4c259e3d8
+        with:
+          solution-folder: 'src/powerplatform/sf-to-dataverse'
+          solution-file: 'out/sf-to-dataverse-managed.zip'
+          solution-type: 'Managed'
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: sf-to-dataverse-managed-${{ github.ref_name }}
+          path: out/sf-to-dataverse-managed.zip
+          if-no-files-found: error
+
+  build-azure-function-package:
+    name: Package Azure Function
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'src/azure/package-lock.json'
+
+      - name: Install production deps
+        working-directory: src/azure
+        run: npm ci --omit=dev
+
+      - name: Zip function app
+        run: |
+          cd src/azure
+          zip -r "../../sf-to-dataverse-azure-${{ github.ref_name }}.zip" . \
+            -x "test/*" "coverage/*" "*.test.js" "node_modules/.cache/*"
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: sf-to-dataverse-azure-${{ github.ref_name }}
+          path: sf-to-dataverse-azure-${{ github.ref_name }}.zip
+          if-no-files-found: error
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-managed-solution, build-azure-function-package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Create release
+        # softprops/action-gh-release v2.6.2
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b
+        with:
+          files: artifacts/**/*.zip
+          generate_release_notes: true
+          draft: true

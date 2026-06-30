@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # Azure Function npm dependencies (src/azure)
+  - package-ecosystem: "npm"
+    directory: "/src/azure"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "fix(azure)"
+      prefix-development: "chore(azure)"
+    groups:
+      opentelemetry:
+        patterns: ["@opentelemetry/*"]
+      azure:
+        patterns: ["@azure/*"]
+
+  # Power Platform plugin NuGet dependencies (src/powerplatform/plugins)
+  - package-ecosystem: "nuget"
+    directory: "/src/powerplatform/plugins"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "fix(powerplatform)"
+
+  # GitHub Actions version bumps across all workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["actions/*"]

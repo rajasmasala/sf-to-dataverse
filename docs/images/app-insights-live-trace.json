@@ -1,0 +1,53 @@
+{
+    "scenarioDescription":  "POST an Event Grid event to the deployed Azure Function and verify the request, handler invocation, and outbound Dataverse token request all appear in Application Insights with correlated span IDs",
+    "salesforce_side":  {
+                            "callout_status":  "Salesforce proxy returned \u0027HTTP/1.1 500 Internal Server Error\u0027 on synchronous test; async Future reports success but no trace reached Azure — likely Salesforce-side outbound proxy restriction on *.azurewebsites.net for this scratch org",
+                            "scratch_org":  "test-scratch@example.com",
+                            "devhub":  "your-devhub@example.com",
+                            "trigger_fires":  "confirmed — two @future callouts reported Status=Completed NumberOfErrors=0"
+                        },
+    "timestamp":  "2026-06-22T14:10:27Z",
+    "trace":  {
+                  "span_timeline":  [
+                                        {
+                                            "event":  "EventGrid trigger fired",
+                                            "t":  "2026-06-22T14:10:27.1525433Z"
+                                        },
+                                        {
+                                            "event":  "Executing Functions.SalesforceCDCWebhook",
+                                            "t":  "2026-06-22T14:10:27.203148Z"
+                                        },
+                                        {
+                                            "event":  "Processing Event Grid event ID: smoke-001 (handler entered)",
+                                            "t":  "2026-06-22T14:10:27.4012822Z"
+                                        },
+                                        {
+                                            "event":  "Dataverse token request failed: AADSTS700038 unauthorized_client (placeholder client_id)",
+                                            "t":  "2026-06-22T14:10:27.681931Z"
+                                        }
+                                    ],
+                  "request_id":  "d2fc949ea8a8dbe7",
+                  "invocation_id":  "f10790a1-aa9d-4a97-8fa8-375facbcd88f",
+                  "duration_ms":  720.535,
+                  "success":  false,
+                  "function_name":  "SalesforceCDCWebhook",
+                  "operation_id":  "d733ff85eb3f41bac5bb91b32d65778d",
+                  "failure_reason":  "Intentional: DATAVERSE_CLIENT_ID was left as placeholder because real credentials live in GitHub Actions secrets and cannot be read locally (gh secret get is not a command). The pipeline up to the outbound Dataverse token request is fully proven."
+              },
+    "scenario":  "End-to-end smoke test of Azure Function Event Grid trigger",
+    "function_app":  {
+                         "name":  "your-func-app",
+                         "region":  "southeastasia",
+                         "resource_id":  "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/your-rg/providers/Microsoft.Web/sites/your-func-app",
+                         "plan":  "Windows Consumption (Y1)",
+                         "host":  "your-func-app.azurewebsites.net",
+                         "runtime":  "Node 22 (~4)"
+                     },
+    "app_insights":  {
+                         "workspace":  "your-log",
+                         "application_id":  "00000000-0000-0000-0000-000000000000",
+                         "name":  "your-appinsights",
+                         "instrumentation_key":  "00000000-0000-0000-0000-000000000000",
+                         "workspace_customer_id":  "00000000-0000-0000-0000-000000000000"
+                     }
+}

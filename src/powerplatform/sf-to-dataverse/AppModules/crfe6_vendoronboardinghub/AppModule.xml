@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppModule>
+  <UniqueName>crfe6_vendoronboardinghub</UniqueName>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <WebApp>
+    <AppModuleType>0</AppModuleType>
+  </WebApp>
+  <DesktopApp>
+    <AppModuleType>2</AppModuleType>
+  </DesktopApp>
+  <MobileApp>
+    <AppModuleType>1</AppModuleType>
+  </MobileApp>
+  <ClientType>4</ClientType>
+  <ClientType>5</ClientType>
+  <NavigationType>0</NavigationType>
+  <AppModuleComponents>
+    <AppModuleComponent type="1" schemaName="account" />
+  </AppModuleComponents>
+  <appmoduleid>a1b2c3d4-e5f6-7890-1234-567890abcdef</appmoduleid>
+  <LocalizedNames>
+    <LocalizedName description="Vendor Onboarding Hub" languagecode="1033" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description description="Model-driven app for the admin persona to monitor Salesforce-synced vendor accounts in Dataverse. Pairs with an embedded canvas custom page (Vendor Validation) for ops analysts." languagecode="1033" />
+  </Descriptions>
+  <Color>#000000</Color>
+</AppModule>

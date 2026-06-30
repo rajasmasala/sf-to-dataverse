@@ -1,0 +1,12 @@
+# LWC Jest test files are not deployable to Salesforce. They import
+# `createElement` from 'lwc' (a Jest-only package) and would fail with
+# LWC1702 if pushed into a scratch org. sfdx-project.json excludes them
+# from package builds, but `sf project deploy start` does not, so we
+# exclude them explicitly here.
+**/lwc/**/__tests__/**
+**/lwc/**/*.test.js
+**/lwc/**/*.test.ts
+
+# Local environment files (never deploy).
+.local/
+sf.config.json

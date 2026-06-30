@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppModuleSiteMap>
+  <SiteMapUniqueName>crfe6_vendoronboardinghub</SiteMapUniqueName>
+  <EnableCollapsibleGroups>False</EnableCollapsibleGroups>
+  <ShowPinnedTiles>False</ShowPinnedTiles>
+  <ShowHomeTabOnLightHeader>True</ShowHomeTabOnLightHeader>
+  <SiteMapName>
+    <Labels>
+      <Label description="Vendor Onboarding Hub" languagecode="1033" />
+    </Labels>
+  </SiteMapName>
+  <SiteMap>
+    <area id="crfe6_vendors" title="Vendors" showGroups="true" icon="/_imgs/imagestrips/transparent_spacer.gif">
+      <group id="crfe6_vendors_group" title="Vendors">
+        <subarea id="crfe6_vendors_accounts" entity="account" title="Vendors" description="Vendors synced from Salesforce and pending validation." />
+      </group>
+    </area>
+  </SiteMap>
+</AppModuleSiteMap>

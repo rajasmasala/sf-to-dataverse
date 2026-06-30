@@ -1,0 +1,33 @@
+{
+  "name": "sf-to-dataverse-azure-middleware",
+  "version": "1.0.0",
+  "description": "Event-driven middleware bridging Salesforce CDC and Dataverse Web API",
+  "main": "src/functions/SalesforceCDCWebhook.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "func start",
+    "test": "jest --ci --coverage",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.0.0",
+    "@azure/identity": "^4.0.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.219.0",
+    "@opentelemetry/instrumentation-http": "^0.219.0",
+    "@opentelemetry/resources": "^2.8.0",
+    "@opentelemetry/sdk-node": "^0.219.0",
+    "@opentelemetry/semantic-conventions": "^1.29.0",
+    "axios": "^1.18.1",
+    "axios-retry": "^4.5.0"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.x",
+    "jest": "^30.4.2"
+  },
+  "overrides": {
+    "js-yaml": "^4.1.2"
+  }
+}

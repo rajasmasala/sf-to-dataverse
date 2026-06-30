@@ -1,0 +1,20 @@
+[
+  {
+    "id": "A1B2C3D4",
+    "eventType": "Salesforce.Vendor.Created",
+    "subject": "VendorOnboarding/001xx000003DGVW",
+    "eventTime": "2026-06-21T02:23:46Z",
+    "data": {
+      "Id": "001xx000003DGVW",
+      "ChangeEventHeader": {
+        "entityName": "Vendor_Onboarding__c",
+        "changeType": "CREATE"
+      },
+      "Name": "Merlion Tech Dynamics Pte Ltd",
+      "UEN__c": "202612345G",
+      "CurrencyIsoCode": "SGD",
+      "Status__c": "Pending Approval"
+    },
+    "dataVersion": "1.0"
+  }
+]

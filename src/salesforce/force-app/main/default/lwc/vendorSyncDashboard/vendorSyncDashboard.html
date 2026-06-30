@@ -1,0 +1,79 @@
+<template>
+    <lightning-card title="Vendor Sync Dashboard" icon-name="standard:record_update">
+        <div slot="actions">
+            <lightning-button
+                label="Refresh"
+                title="Reload sync status from Salesforce"
+                onclick={handleRefresh}
+                disabled={isRefreshing}
+            ></lightning-button>
+        </div>
+
+        <lightning-layout multiple-rows vertical-align="stretch">
+            <!-- Recent synced vendors table -->
+            <lightning-layout-item size="8" medium-device-size="12" small-device-size="12" padding="around-small">
+                <h2 class="slds-text-heading_small slds-m-bottom_x-small">
+                    Recently Synced Vendors
+                </h2>
+
+                <template if:true={showRecentError}>
+                    <div class="slds-form-element__help slds-has-error" role="alert">
+                        {recentErrorMessage}
+                    </div>
+                </template>
+
+                <template if:true={hasRecentVendors}>
+                    <lightning-datatable
+                        key-field="accountId"
+                        data={recentVendors}
+                        columns={columns}
+                        hide-checkbox-column
+                        show-row-number-column
+                    ></lightning-datatable>
+                </template>
+
+                <template if:false={hasRecentVendors}>
+                    <p class="slds-text-color_weak slds-p-around_medium">
+                        No vendors synced yet.
+                    </p>
+                </template>
+            </lightning-layout-item>
+
+            <!-- Failed syncs tile -->
+            <lightning-layout-item size="4" medium-device-size="12" small-device-size="12" padding="around-small">
+                <lightning-card variant="narrow">
+                    <h2 slot="title" class="slds-text-heading_small">
+                        {failedCountLabel}
+                    </h2>
+
+                    <template if:true={showFailedError}>
+                        <div class="slds-form-element__help slds-has-error" role="alert">
+                            {failedErrorMessage}
+                        </div>
+                    </template>
+
+                    <template if:true={hasFailedVendors}>
+                        <ul class="slds-list_dotted slds-p-around_small">
+                            <template for:each={failedVendors} for:item="vendor">
+                                <li key={vendor.accountId} class="slds-item">
+                                    <div class="slds-text-body_regular slds-text-color_default">
+                                        {vendor.name}
+                                    </div>
+                                    <div class="slds-text-body_small slds-text-color_weak">
+                                        UEN: {vendor.uen}
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+
+                    <template if:false={hasFailedVendors}>
+                        <p class="slds-text-color_weak slds-p-around_small">
+                            No failed syncs. All good.
+                        </p>
+                    </template>
+                </lightning-card>
+            </lightning-layout-item>
+        </lightning-layout>
+    </lightning-card>
+</template>

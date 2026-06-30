@@ -1,0 +1,69 @@
+{
+  "capturedAt": "2026-06-22T18:19:21.5170943Z",
+  "summary": "Full end-to-end live integration: Azure Function received synthetic Event Grid events, exchanged tokens with Entra ID, and PATCHed the Dataverse environment via alternate-key upsert. Both invocations returned HTTP 201 Created.",
+  "architecture": {
+    "functionApp": "your-func-app (Windows Consumption Y1, Node 22, Functions v4)",
+    "functionAppUrl": "https://your-func-app.azurewebsites.net",
+    "functionEntry": "src/functions/SalesforceCDCWebhook.js",
+    "appInsights": "your-appinsights (workspace-mode, Log Analytics your-log)",
+    "dataverseEnv": "https://orgXXXXXXXX.crm5.dynamics.com",
+    "region": "southeastasia"
+  },
+  "testInvocations": [
+    {
+      "eventId": "smoke-001",
+      "operationId": "62978d6237438d9f87d439a5c7825240",
+      "requestId": "cc19174ad15b7ad4",
+      "startTimeUtc": "2026-06-22T17:57:12.0238302Z",
+      "durationMs": 9730.4025,
+      "resultCode": 0,
+      "success": true,
+      "traceFlow": [
+        { "t": "2026-06-22T17:57:12.2359703Z", "msg": "Processing Event Grid event ID: smoke-001" },
+        { "t": "2026-06-22T17:57:15.4470253Z", "msg": "No Dataverse currency row found for ISO code 'USD'. Skipping currency bind." },
+        { "t": "2026-06-22T17:57:15.4471139Z", "msg": "Executing idempotent patch for salesforceId 001smoke" },
+        { "t": "2026-06-22T17:57:21.7099570Z", "msg": "Dataverse synchronization successful. Status Code: 201" }
+      ],
+      "dataverseRecord": {
+        "table": "account",
+        "alternateKey": "crfe6_salesforceid=001smoke",
+        "name": "Smoke Test",
+        "crfe6_uen": "SMOKEUEN",
+        "createdon": "2026-06-22T17:57:16Z"
+      }
+    },
+    {
+      "eventId": "smoke-final-001",
+      "operationId": "fe1bd482ac664eb952f798fd36041df7",
+      "requestId": "2ac7e4a8989bf810",
+      "startTimeUtc": "2026-06-22T18:06:16.7535573Z",
+      "durationMs": 707.0175,
+      "resultCode": 0,
+      "success": true,
+      "note": "Warm invocation — 14x faster than cold start. Demonstrates the module-scope credential cache working.",
+      "traceFlow": [
+        { "t": "2026-06-22T18:06:16.7636213Z", "msg": "Processing Event Grid event ID: smoke-final-001" },
+        { "t": "2026-06-22T18:06:16.9355500Z", "msg": "No Dataverse currency row found for ISO code 'USD'. Skipping currency bind." },
+        { "t": "2026-06-22T18:06:16.9355567Z", "msg": "Executing idempotent patch for salesforceId 001finalsmoke" },
+        { "t": "2026-06-22T18:06:17.4580689Z", "msg": "Dataverse synchronization successful. Status Code: 201" }
+      ]
+    }
+  ],
+  "deploymentHistory": [
+    { "name": "azure-function.zip", "uploadedAt": "2026-06-22T12:02:06Z", "note": "Initial; broken package.json main glob" },
+    { "name": "azure-function-v2.zip", "uploadedAt": "2026-06-22T13:15:10Z" },
+    { "name": "azure-function-v3.zip", "uploadedAt": "2026-06-22T13:41:26Z", "note": "Fixed host.json but still wrong main glob" },
+    { "name": "azure-function-v4.zip", "uploadedAt": "2026-06-22T15:59:46Z", "note": "Source-only, missing node_modules" },
+    { "name": "azure-source-only.zip", "deployedAt": "2026-06-22T17:41:33Z", "note": "Final working deploy via config-zip + Kudu restore" }
+  ],
+  "appSettingsUsed": [
+    "FUNCTIONS_WORKER_RUNTIME=node",
+    "WEBSITE_NODE_DEFAULT_VERSION=~22",
+    "FUNCTIONS_EXTENSION_VERSION=~4",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING=<set>",
+    "DATAVERSE_ENV_URL=https://orgXXXXXXXX.crm5.dynamics.com",
+    "DATAVERSE_CLIENT_ID=00000000-0000-0000-0000-000000000000",
+    "DATAVERSE_TENANT_ID=00000000-0000-0000-0000-000000000000",
+    "OTEL_SERVICE_ENV=prod"
+  ]
+}

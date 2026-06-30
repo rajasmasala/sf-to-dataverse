@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.24034.120" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SolutionManifest>
+    <UniqueName>UniversalFabric</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Universal Fabric" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Salesforce-to-Dataverse vendor integration fabric" languagecode="1033" />
+    </Descriptions>
+    <Version>1.2.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>universalfabric</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="Universal Fabric" languagecode="1033" />
+      </LocalizedNames>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <City>Singapore</City>
+          <Country>Singapore</Country>
+          <EmailAddress>noreply@universalfabric.example</EmailAddress>
+          <Telephone>+65 0000 0000</Telephone>
+        </Address>
+        <Address>
+          <AddressNumber>2</AddressNumber>
+        </Address>
+      </Addresses>
+      <CustomizationPrefix>crfe6</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>10000</CustomizationOptionValuePrefix>
+      <SupportedComponents>
+        <SupportedComponent type="1" subtype="0" />
+        <SupportedComponent type="29" subtype="0" />
+        <SupportedComponent type="80" subtype="0" />
+      </SupportedComponents>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="1" schemaName="account" behavior="0" />
+      <RootComponent type="80" schemaName="crfe6_vendoronboardinghub" behavior="0" />
+      <RootComponent type="80" schemaName="crfe6_vendorvalidation" behavior="0" />
+      <RootComponent type="29" schemaName="crfe6_vendor-onboarding-approval" behavior="0" />
+      <RootComponent type="29" schemaName="crfe6_get-vendor-sync-status" behavior="0" />
+      <!-- TODO (canvas app): once the "Vendor Sync Dashboard" Canvas app is authored in
+           Power Apps Studio per docs/canvas-app-runbook.md and added to this solution,
+           register it here as a CanvasApp root component, e.g.:
+           <RootComponent type="300" schemaName="crfe6_vendorsyncdashboard" behavior="0" />
+           (type 300 = CanvasApp; the schemaName is the app's unique name in Dataverse.) -->
+    </RootComponents>
+    <MissingDependencies />
+  </SolutionManifest>
+</ImportExportXml>

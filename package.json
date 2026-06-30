@@ -1,0 +1,13 @@
+{
+  "name": "sf-to-dataverse",
+  "private": true,
+  "description": "Root-level package.json for the SF-to-Dataverse PoC. The Salesforce LWC Jest tests under src/salesforce/force-app/main/default/lwc run via @salesforce/sfdx-lwc-jest, which expects to be invoked from the repo root (where sfdx-project.json lives). The Azure Jest tests under src/azure/test have their own pipeline (cd src/azure && npm test) and are explicitly ignored here so the LWC runner never tries to transform them with its LWC-only Babel preset.",
+  "scripts": {
+    "test:unit": "sfdx-lwc-jest -- --testPathIgnorePatterns node_modules src/azure",
+    "test:unit:watch": "sfdx-lwc-jest --watch",
+    "test:unit:coverage": "sfdx-lwc-jest --coverage"
+  },
+  "devDependencies": {
+    "@salesforce/sfdx-lwc-jest": "^4.0.1"
+  }
+}

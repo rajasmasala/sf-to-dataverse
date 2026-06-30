@@ -1,0 +1,46 @@
+{
+  "capturedAt": "2026-06-23T04:45:00Z",
+  "summary": "TRIGGER-DRIVEN end-to-end: Salesforce VendorTrigger fired naturally on Account insert, queued @future(callout=true) -> Azure Function -> Dataverse (HTTP 201). No synthetic calls. Account.Sync_Status__c was automatically stamped to 'Synced' by the handler, proving the callout succeeded.",
+  "testType": "trigger-driven (asynchronous @future callout, fired by DML)",
+  "architecture": {
+    "salesforceOrg": "scratch org test-inbk2yqot4v0@example.com (DevHub: your-devhub@example.com)",
+    "triggerEntryPoint": "Account insert (after insert) -> VendorTrigger -> VendorTriggerHandler.sendVendorsToAzure (@future)",
+    "namedCredential": "Azure_EventGrid_Endpoint (patched at runtime via Tooling API to point at live function URL + extension key)",
+    "functionApp": "your-func-app",
+    "dataverseEnv": "https://orgXXXXXXXX.crm5.dynamics.com"
+  },
+  "liveInvocation": {
+    "accountInsertedAt": "2026-06-23T04:34:08Z",
+    "salesforceAccountId": "001C200000R2gEzIAJ",
+    "accountName": "Trigger-Driven E2E Vendor 1782189248746",
+    "accountUEN": "TRIGGERE2E001",
+    "syncStatusAfterFutureFlush": "Synced",
+    "appInsightsRequest": {
+      "name": "SalesforceCDCWebhook",
+      "success": true,
+      "resultCode": 0,
+      "durationMs": 2186,
+      "id": "46b72d1555d05616",
+      "timeGenerated": "2026-06-23T04:34:57.9050639Z"
+    },
+    "dataverseRecord": {
+      "table": "account",
+      "name": "Trigger-Driven E2E Vendor 1782189248746",
+      "crfe6_uen": "TRIGGERE2E001",
+      "crfe6_salesforceid": "001C200000R2gEzIAJ",
+      "createdon": "2026-06-23T04:34:59Z"
+    },
+    "roundTripLatency": {
+      "triggerFiredToDataverseCreated": "about 51s (cold-start; first invocation after restart)",
+      "handlerSyncStatusConfirmed": "checked ~2m later via FireTriggerE2E.checkStatus() -> STATUS=Synced"
+    }
+  },
+  "scriptsUsed": [
+    "scripts/FireTriggerE2E.cls - temporary Apex class (deployed) that inserts an Account and lets VendorTrigger fire naturally. Required because anonymous Apex uses a different (cached) schema view than compiled classes; UEN__c is visible inside the class but not from sf apex run.",
+    "scripts/update-nc.apex - patches the Azure_EventGrid_Endpoint Named Credential at runtime via the Tooling API so callout:Azure_EventGrid_Endpoint resolves to the live function URL with the EG extension key.",
+    "scripts/call-fire.apex - thin anonymous Apex wrapper that calls FireTriggerE2E.fire()."
+  ],
+  "notes": [
+    "The handler's setTimeout was bumped from 10000ms to 60000ms in this PR. Apex's default 10s callout timeout cannot survive a Windows Consumption cold start (~10-30s). With 60s, the @future job comfortably waits through cold start."
+  ]
+}

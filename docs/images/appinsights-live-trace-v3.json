@@ -1,0 +1,45 @@
+{
+  "capturedAt": "2026-06-22T19:55:00Z",
+  "summary": "TRUE END-TO-END: Salesforce scratch org Apex Http.send -> Azure Function (Event Grid webhook) -> Dataverse (HTTP 201 Created). The full pipeline fired from Salesforce and persisted a real record in Dataverse, captured in Application Insights.",
+  "previousDiagnosisCorrected": {
+    "claim": "scratch orgs proxy outbound HTTP and 500 on *.azurewebsites.net",
+    "actual": "scratch orgs CAN reach *.azurewebsites.net. The previous 'proxy 500' error was a misread of a cold-start timeout. The function was unresponsive because the deployed package.json had an invalid glob ('src/functions/*.js') preventing runtime registration, so the host returned 500. After fixing package.json + redeploying, callouts succeed in ~1s when warm."
+  },
+  "architecture": {
+    "salesforceOrg": "scratch org test-scratch@example.com (DevHub: your-devhub@example.com)",
+    "apexEntryPoint": "scripts/e2e-callout-diagnostic.apex",
+    "remoteSiteSettingsDeployed": ["httpbin_org", "ufp_func_sea"],
+    "functionApp": "your-func-app (Windows Consumption, Node 22, Functions v4)",
+    "functionAppUrl": "https://your-func-app.azurewebsites.net",
+    "appInsights": "your-appinsights (operation id be917ed0-b70f-4378-8e5a-d1cdc1669f81)",
+    "dataverseEnv": "https://orgXXXXXXXX.crm5.dynamics.com"
+  },
+  "liveInvocation": {
+    "eventId": "sf-apex-live-1782157972204",
+    "operationId": "be917ed0-b70f-4378-8e5a-d1cdc1669f81",
+    "requestId": "be917ed0-b70f-4378-8e5a-d1cdc1669f81",
+    "startTimeUtc": "2026-06-22T19:52:52.2652840Z",
+    "apexRoundTripMs": 1106,
+    "functionExecutionMs": 1009,
+    "apexStatus": 202,
+    "dataverseResult": 201,
+    "success": true,
+    "traceFlow": [
+      { "t": "2026-06-22T19:52:52.2645923Z", "msg": "ExtensionSystemOptions loaded (Event Grid extension, webhook authorization level=System)" },
+      { "t": "2026-06-22T19:52:52.2652840Z", "msg": "Executing Functions.SalesforceCDCWebhook (Reason='EventGrid trigger fired')" },
+      { "t": "2026-06-22T19:52:52.2731624Z", "msg": "Processing Event Grid event ID: sf-apex-live-1782157972204" },
+      { "t": "2026-06-22T19:52:52.7276062Z", "msg": "No Dataverse currency row found for ISO code 'USD'. Skipping currency bind." },
+      { "t": "2026-06-22T19:52:52.7276738Z", "msg": "Executing idempotent patch for salesforceId 001apexlive" },
+      { "t": "2026-06-22T19:52:53.2736327Z", "msg": "Dataverse synchronization successful. Status Code: 201" },
+      { "t": "2026-06-22T19:52:53.2738797Z", "msg": "Executed 'Functions.SalesforceCDCWebhook' (Succeeded, Duration=1008ms)" }
+    ],
+    "dataverseRecord": {
+      "table": "account",
+      "alternateKey": "crfe6_salesforceid=001apexlive",
+      "name": "SF Apex Live Vendor",
+      "crfe6_uen": "APEXLIVE001",
+      "crfe6_salesforceid": "001apexlive",
+      "createdon": "2026-06-22T19:52:52Z"
+    }
+  }
+}

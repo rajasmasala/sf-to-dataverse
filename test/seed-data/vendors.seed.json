@@ -1,0 +1,235 @@
+{
+  "$comment": "Realistic dummy Singapore vendor dataset for the SF->Dataverse Loom demo. All company names, UENs, and Salesforce IDs are INVENTED — format is plausible but the numbers are made up. Coexists with (does not clobber) the existing e2e test vendor 'SF Apex Live Vendor' / UEN APEXLIVE001 / SF ID 001apexlive.",
+  "$distribution": "Target Dataverse sync-status mix: 15 Synced, 3 Pending, 4 Error. Synced rows come naturally from a happy-path sync (or are upserted as Synced by seed-dataverse.js); the 3 Pending + 4 Error are injected post-hoc by vary-status.js to give the Copilot agent / Canvas app / Power BI report a varied, demo-worthy picture rather than a wall of identical 'Synced' rows.",
+  "$linkageNote": "LINKAGE (B1): by default seed-dataverse.js resolves the REAL Salesforce Account.Id for each vendor by shelling out to `sf data query` (SOQL re-query by UEN) and uses that real Id as the Dataverse alt-key value. So crfe6_salesforceid in Dataverse ends up holding the actual Salesforce Id — a side-by-side Loom shot of the SF Account list and the Dataverse gallery lines up. The synthetic salesforceId values below (001SEED01…) are FALLBACKS, used only when (a) --use-synthetic-ids is passed (dry-runs without SF auth), or (b) the SF resolver finds no row for a given UEN.",
+  "$currencyRationale": "Mostly SGD (env default). A few non-SGD (USD/MYR/EUR) are cosmetic field variety only. NOTE: the Azure Function does NOT error on an unmapped currency — dataverseSync.js:70-74 logs 'Skipping currency bind' and proceeds to stamp Synced. So currency mismatches are NOT an Error cause under real sync; do not use currency as a Phase-2 Error narrative. (Sentosa Fresh Catering's Error note below was retargeted to a non-currency cause for this reason.)",
+  "$timestampRationale": "lastModifiedHoursAgo is a relative offset; the seeding scripts compute the actual ISO 8601 UTC timestamp at runtime from now, so the Power BI Sync Health trend always spans the last ~14 days regardless of when the demo is recorded.",
+  "$uenFormat": "Singapore local-company UENs look like 20YYNNNNN<letter> (or 19YY... for older firms). Values below are fabricated but format-correct and unique within this set. UEN__c field length is 18; all values are 10 chars.",
+  "vendors": [
+    {
+      "name": "Changi Airfreight Services Pte Ltd",
+      "uen": "201923451K",
+      "salesforceId": "001SEED01",
+      "currency": "SGD",
+      "industry": "Logistics / Airfreight",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 2,
+      "loomNarrative": "Flagship success story — the synced vendor the demo opens with."
+    },
+    {
+      "name": "Sentosa Fresh Catering Pte Ltd",
+      "uen": "202014567B",
+      "salesforceId": "001SEED02",
+      "currency": "INR",
+      "industry": "Catering / F&B",
+      "targetStatus": "Error",
+      "syncNotes": "Dataverse Web API returned 412 Precondition Failed — concurrency token mismatch during PATCH (row updated by another process mid-sync)",
+      "lastModifiedHoursAgo": 5,
+      "loomNarrative": "Relatable error: optimistic-concurrency collision during PATCH — a row mid-sync was touched by another integration run."
+    },
+    {
+      "name": "Jurong Logistics Group Pte Ltd",
+      "uen": "201845678A",
+      "salesforceId": "001SEED03",
+      "currency": "SGD",
+      "industry": "Logistics / Freight",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 26
+    },
+    {
+      "name": "Marina Bay Freight Forwarders Pte Ltd",
+      "uen": "202156789C",
+      "salesforceId": "001SEED04",
+      "currency": "SGD",
+      "industry": "Logistics / Freight Forwarding",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 70
+    },
+    {
+      "name": "Lion City Construction Pte Ltd",
+      "uen": "199834521D",
+      "salesforceId": "001SEED05",
+      "currency": "SGD",
+      "industry": "Construction",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 144
+    },
+    {
+      "name": "Pulau Merino Catering Singapore Pte Ltd",
+      "uen": "202234512F",
+      "salesforceId": "001SEED06",
+      "currency": "SGD",
+      "industry": "Catering / F&B",
+      "targetStatus": "Pending",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 1,
+      "loomNarrative": "Pending — vendor just updated in Salesforce, sync is in flight."
+    },
+    {
+      "name": "Tampines IT Solutions Pte Ltd",
+      "uen": "201967890G",
+      "salesforceId": "001SEED07",
+      "currency": "USD",
+      "industry": "IT / Managed Services",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 48
+    },
+    {
+      "name": "Orchard Managed Services Asia Pacific Pte Ltd",
+      "uen": "201712345H",
+      "salesforceId": "001SEED08",
+      "currency": "SGD",
+      "industry": "IT / Managed Services",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 96
+    },
+    {
+      "name": "Bukit Timah Facilities Maintenance Pte Ltd",
+      "uen": "202078901J",
+      "salesforceId": "001SEED09",
+      "currency": "SGD",
+      "industry": "Facilities / Maintenance",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 168
+    },
+    {
+      "name": "Kallang Packaging Industries Pte Ltd",
+      "uen": "201945612K",
+      "salesforceId": "001SEED10",
+      "currency": "SGD",
+      "industry": "Packaging",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 22
+    },
+    {
+      "name": "Geylang Transport & Haulage Pte Ltd",
+      "uen": "202189023L",
+      "salesforceId": "001SEED11",
+      "currency": "MYR",
+      "industry": "Transport / Haulage",
+      "targetStatus": "Error",
+      "syncNotes": "Timeout (504) from Dataverse Web API during PATCH — 3 retries exhausted",
+      "lastModifiedHoursAgo": 8
+    },
+    {
+      "name": "Serangoon Security Services Pte Ltd",
+      "uen": "201678904M",
+      "salesforceId": "001SEED12",
+      "currency": "SGD",
+      "industry": "Security",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 120
+    },
+    {
+      "name": "Bedok Printing House Pte Ltd",
+      "uen": "202056718N",
+      "salesforceId": "001SEED13",
+      "currency": "SGD",
+      "industry": "Printing",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 240
+    },
+    {
+      "name": "Hougang Uniforms & PPE Pte Ltd",
+      "uen": "202145629P",
+      "salesforceId": "001SEED14",
+      "currency": "SGD",
+      "industry": "Uniforms / PPE",
+      "targetStatus": "Pending",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 0,
+      "loomNarrative": "Pending — vendor updated seconds ago, sync is in flight."
+    },
+    {
+      "name": "Woodlands Waste Management Pte Ltd",
+      "uen": "201989032Q",
+      "salesforceId": "001SEED15",
+      "currency": "SGD",
+      "industry": "Waste Management",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 216
+    },
+    {
+      "name": "Clementi Professional Services Pte Ltd",
+      "uen": "202012345R",
+      "salesforceId": "001SEED16",
+      "currency": "EUR",
+      "industry": "Professional Services",
+      "targetStatus": "Error",
+      "syncNotes": "Duplicate Salesforce ID detected — alternate key collision with another Account",
+      "lastModifiedHoursAgo": 3
+    },
+    {
+      "name": "Ang Mo Kio Catering Pte Ltd",
+      "uen": "201956748T",
+      "salesforceId": "001SEED17",
+      "currency": "SGD",
+      "industry": "Catering / F&B",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 92
+    },
+    {
+      "name": "Queenstown Industrial Supplies Pte Ltd",
+      "uen": "202178909U",
+      "salesforceId": "001SEED18",
+      "currency": "SGD",
+      "industry": "Industrial Supplies",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 264
+    },
+    {
+      "name": "Newton Freight & Warehousing Pte Ltd",
+      "uen": "201834561V",
+      "salesforceId": "001SEED19",
+      "currency": "SGD",
+      "industry": "Logistics / Warehousing",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 140
+    },
+    {
+      "name": "Bishan Technical Services Singapore Pte Ltd",
+      "uen": "202245672W",
+      "salesforceId": "001SEED20",
+      "currency": "SGD",
+      "industry": "IT / Managed Services",
+      "targetStatus": "Error",
+      "syncNotes": "Validation failed: UEN field is null in source record",
+      "lastModifiedHoursAgo": 288
+    },
+    {
+      "name": "East Coast Marine Supplies Pte Ltd",
+      "uen": "201967813X",
+      "salesforceId": "001SEED21",
+      "currency": "USD",
+      "industry": "Logistics / Marine Supplies",
+      "targetStatus": "Synced",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 50
+    },
+    {
+      "name": "Tuas Industrial Catering Asia Pacific Pte Ltd",
+      "uen": "202023454Z",
+      "salesforceId": "001SEED22",
+      "currency": "SGD",
+      "industry": "Catering / F&B",
+      "targetStatus": "Pending",
+      "syncNotes": null,
+      "lastModifiedHoursAgo": 4,
+      "loomNarrative": "Pending — vendor updated a few hours ago, sync is in flight."
+    }
+  ]
+}

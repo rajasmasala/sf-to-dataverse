@@ -1,0 +1,25 @@
+# CODEOWNERS — GitHub will request review from these owners on PRs
+# touching the given paths. Each PR auto-assigns reviewers based on
+# the most specific match.
+#
+# Format: <path-pattern> <owner1> <owner2> ...
+
+# Salesforce DX project (Apex classes, triggers, metadata, scratch config)
+/src/salesforce/            @rajasmasala
+/config/                    @rajasmasala
+/sfdx-project.json          @rajasmasala
+
+# Azure Functions middleware
+/src/azure/                 @rajasmasala
+
+# Power Platform / Dataverse solution
+/src/powerplatform/         @rajasmasala
+
+# CI/CD pipeline definitions
+/.github/workflows/         @rajasmasala
+
+# Security incident reports and SOPs — require maintainer sign-off
+/docs/security/             @rajasmasala
+
+# Root files (package locks, README, gitignore) — fall through to default
+*                           @rajasmasala

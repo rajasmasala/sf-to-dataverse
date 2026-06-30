@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Entities />
+  <Roles />
+  <Workflows>
+    <Workflow Name="crfe6_vendor-onboarding-approval" Description="Sends an approval email when a new vendor lands in Dataverse without sync notes." WorkflowId="b12c8d9f-1234-4321-9abc-def012345679" xamlFileName="/Workflows/crfe6_vendor-onboarding-approval-B12C8D9F-1234-4321-9ABC-DEF012345679.xaml" Category="5" Mode="1" Scope="4" OnDemand="0" TriggerOnUpdateAttributeList="" TriggerOnCreate="1" TriggerOnDelete="0" SyncWorkflowLogOnFailure="0" StateCode="0" StatusCode="1" CreatedBy="~" CreatedOn="~" CustomizationLevel="1" IsCustomizable="1" IntroducedVersion="1.0.0.0" xmlns="http://schemas.microsoft.com/crm/2011/WebServices">
+      <XamlFileName>/Workflows/crfe6_vendor-onboarding-approval-B12C8D9F-1234-4321-9ABC-DEF012345679.xaml</XamlFileName>
+      <JsonFileName>/Workflows/crfe6_vendor-onboarding-approval-B12C8D9F-1234-4321-9ABC-DEF012345679.json</JsonFileName>
+      <Category>5</Category>
+      <Mode>1</Mode>
+      <Scope>4</Scope>
+      <OnDemand>0</OnDemand>
+      <TriggerOnCreate>1</TriggerOnCreate>
+      <TriggerOnDelete>0</TriggerOnDelete>
+      <SyncWorkflowLogOnFailure>0</SyncWorkflowLogOnFailure>
+      <StateCode>0</StateCode>
+      <StatusCode>1</StatusCode>
+      <CreateStage>40</CreateStage>
+      <IsCustomizable>1</IsCustomizable>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <JsonMetaDataFileName>/Workflows/crfe6_vendor-onboarding-approval-B12C8D9F-1234-4321-9ABC-DEF012345679.json</JsonMetaDataFileName>
+      <ClientData>/Workflows/crfe6_vendor-onboarding-approval-B12C8D9F-1234-4321-9ABC-DEF012345679.clientdata.json</ClientData>
+    </Workflow>
+  </Workflows>
+  <FieldSecurityProfiles />
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls />
+  <SolutionPluginAssemblies />
+  <AppModuleSiteMaps />
+  <AppModules />
+  <EntityDataProviders />
+  <RelationshipRoles />
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>

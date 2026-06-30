@@ -1,0 +1,14 @@
+# .NET build output
+bin/
+obj/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/

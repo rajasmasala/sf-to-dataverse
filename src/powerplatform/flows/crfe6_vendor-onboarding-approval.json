@@ -1,0 +1,86 @@
+{
+  "name": "crfe6_vendor-onboarding-approval",
+  "id": "/providers/Microsoft.PowerApps/apis/shared_flows/crfe6_vendor-onboarding-approval",
+  "type": "Microsoft.PowerApps/apis",
+  "properties": {
+    "displayName": "Vendor Onboarding Approval Email",
+    "description": "Triggered when a new Account row is added to Dataverse with a Salesforce ID populated but no sync notes. Sends an approval email so an ops analyst reviews the UEN before onboarding is finalised. Mirrors the Salesforce-side approval queue in Dataverse.",
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "triggers": {
+        "When_a_row_is_added_modified_or_deleted": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "CreateListOnEntityChangeTrigger"
+            },
+            "parameters": {
+              "dataEnvironment": "Default",
+              "entityName": "accounts",
+              "changeTypes": ["Create"],
+              "scope": "Organization",
+              "filterExpression": "crfe6_salesforceid ne null and crfe6_sync_notes eq null"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_record": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "GetItem"
+            },
+            "parameters": {
+              "entityName": "accounts",
+              "recordId": "@triggerOutputs()?['body/accountid']",
+              "$select": "name,crfe6_uen,crfe6_salesforceid"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_approval_email": {
+          "runAfter": {
+            "Get_record": ["Succeeded"]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2"
+            },
+            "parameters": {
+              "to": "@parameters('ApproverEmail')",
+              "subject": "Vendor pending validation: @{outputs('Get_record')?['body/name']}",
+              "body": {
+                "message": "<p><b>Vendor pending validation</b></p><ul><li><b>Name:</b> @{outputs('Get_record')?['body/name']}</li><li><b>UEN:</b> @{outputs('Get_record')?['body/crfe6_uen']}</li><li><b>Salesforce ID:</b> @{outputs('Get_record')?['body/crfe6_salesforceid']}</li></ul><p>Open the Vendor Validation canvas page in the model-driven app to validate this vendor against ACRA Bizfile before approving onboarding.</p>"
+              },
+              "importance": "Normal"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$authentication": {
+        "type": "Object",
+        "metadata": {
+          "description": "Authentication for the Dataverse and Office 365 connectors"
+        }
+      },
+      "ApproverEmail": {
+        "type": "String",
+        "metadata": {
+          "description": "The ops analyst distribution list that should receive pending-vendor approval emails."
+        }
+      }
+    }
+  }
+}

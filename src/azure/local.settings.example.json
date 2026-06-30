@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "DATAVERSE_ENV_URL": "https://YOUR_ORG.crm4.dynamics.com",
+    "DATAVERSE_TENANT_ID": "00000000-0000-0000-0000-000000000000",
+    "DATAVERSE_CLIENT_ID": "00000000-0000-0000-0000-000000000000",
+    "DATAVERSE_CLIENT_SECRET": "REPLACE_WITH_AZURE_APP_REGISTRATION_SECRET",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4318/v1/traces",
+    "OTEL_SERVICE_ENV": "local"
+  }
+}

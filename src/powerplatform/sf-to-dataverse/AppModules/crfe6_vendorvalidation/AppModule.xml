@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppModule>
+  <UniqueName>crfe6_vendorvalidation</UniqueName>
+  <IntroducedVersion>1.0.0.0</IntroducedVersion>
+  <WebApp>
+    <AppModuleType>3</AppModuleType>
+  </WebApp>
+  <ClientType>8</ClientType>
+  <NavigationType>0</NavigationType>
+  <AppModuleComponents />
+  <appmoduleid>c2d3e4f5-6789-0123-4567-890abcdef0123</appmoduleid>
+  <LocalizedNames>
+    <LocalizedName description="Vendor Validation" languagecode="1033" />
+  </LocalizedNames>
+  <Descriptions>
+    <Description description="Embedded canvas custom page used inside the Account form by ops analysts to validate the UEN of a synced vendor against the ACRA Bizfile mock API before onboarding is approved." languagecode="1033" />
+  </Descriptions>
+  <Color>#000000</Color>
+</AppModule>

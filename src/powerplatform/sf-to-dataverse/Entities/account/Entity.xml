@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name LocalizedName="Account" OriginalName="Account">Account</Name>
+  <EntityInfo>
+    <entity Name="Account">
+      <LocalizedNames>
+        <LocalizedName description="Account" languagecode="1033" />
+      </LocalizedNames>
+      <LocalizedCollectionNames>
+        <LocalizedCollectionName description="Accounts" languagecode="1033" />
+      </LocalizedCollectionNames>
+      <Descriptions>
+        <Description description="Business or vendor account synced from Salesforce via the Universal Fabric integration." languagecode="1033" />
+      </Descriptions>
+      <attributes>
+        <attribute PhysicalName="crfe6_SalesforceId">
+          <Type>nvarchar</Type>
+          <Name>crfe6_salesforceid</Name>
+          <LogicalName>crfe6_salesforceid</LogicalName>
+          <RequiredLevel>ApplicationRequired</RequiredLevel>
+          <IsCustomField>1</IsCustomField>
+          <IsCustomizable>1</IsCustomizable>
+          <IsSecured>0</IsSecured>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>Auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsLogical>0</IsLogical>
+          <IsPrimaryName>0</IsPrimaryName>
+          <format>text</format>
+          <MaxLength>100</MaxLength>
+          <Length>100</Length>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <displayname>
+            <displaynames>
+              <displayname description="Salesforce ID" languagecode="1033" />
+            </displaynames>
+          </displayname>
+          <DescriptionLocalizations>
+            <DescriptionLocalization description="Salesforce record ID mirrored for idempotent upsert via the crfe6_salesforceid alternate key." languagecode="1033" />
+          </DescriptionLocalizations>
+        </attribute>
+        <attribute PhysicalName="crfe6_UEN">
+          <Type>nvarchar</Type>
+          <Name>crfe6_uen</Name>
+          <LogicalName>crfe6_uen</LogicalName>
+          <RequiredLevel>None</RequiredLevel>
+          <IsCustomField>1</IsCustomField>
+          <IsCustomizable>1</IsCustomizable>
+          <IsSecured>0</IsSecured>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>Auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsLogical>0</IsLogical>
+          <IsPrimaryName>0</IsPrimaryName>
+          <format>text</format>
+          <MaxLength>50</MaxLength>
+          <Length>50</Length>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <displayname>
+            <displaynames>
+              <displayname description="UEN" languagecode="1033" />
+            </displaynames>
+          </displayname>
+          <DescriptionLocalizations>
+            <DescriptionLocalization description="Singapore Unique Entity Number (ACRA identifier) mirrored from the Salesforce UEN__c field." languagecode="1033" />
+          </DescriptionLocalizations>
+        </attribute>
+        <attribute PhysicalName="crfe6_LastModifiedByIntegrationAt">
+          <Type>datetime</Type>
+          <Name>crfe6_lastmodifiedbyintegration_at</Name>
+          <LogicalName>crfe6_lastmodifiedbyintegration_at</LogicalName>
+          <RequiredLevel>None</RequiredLevel>
+          <IsCustomField>1</IsCustomField>
+          <IsCustomizable>1</IsCustomizable>
+          <IsSecured>0</IsSecured>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>Auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsLogical>0</IsLogical>
+          <IsPrimaryName>0</IsPrimaryName>
+          <format>datetime</format>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <displayname>
+            <displaynames>
+              <displayname description="Last Modified By Integration At" languagecode="1033" />
+            </displaynames>
+          </displayname>
+          <DescriptionLocalizations>
+            <DescriptionLocalization description="UTC timestamp stamped by the AccountUpdateStampPlugin whenever a vendor update touches crfe6_salesforceid or crfe6_uen." languagecode="1033" />
+          </DescriptionLocalizations>
+        </attribute>
+        <attribute PhysicalName="crfe6_SyncNotes">
+          <Type>nvarchar</Type>
+          <Name>crfe6_sync_notes</Name>
+          <LogicalName>crfe6_sync_notes</LogicalName>
+          <RequiredLevel>None</RequiredLevel>
+          <IsCustomField>1</IsCustomField>
+          <IsCustomizable>1</IsCustomizable>
+          <IsSecured>0</IsSecured>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>Auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsLogical>0</IsLogical>
+          <IsPrimaryName>0</IsPrimaryName>
+          <format>text</format>
+          <MaxLength>500</MaxLength>
+          <Length>500</Length>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <displayname>
+            <displaynames>
+              <displayname description="Sync Notes" languagecode="1033" />
+            </displaynames>
+          </displayname>
+          <DescriptionLocalizations>
+            <DescriptionLocalization description="Short audit note appended by the AccountUpdateStampPlugin (e.g. 'Updated via Plugin at &lt;UTC ISO 8601&gt;') when a synced field changes." languagecode="1033" />
+          </DescriptionLocalizations>
+        </attribute>
+        <attribute PhysicalName="crfe6_SyncStatus">
+          <Type>picklist</Type>
+          <Name>crfe6_syncstatus</Name>
+          <LogicalName>crfe6_syncstatus</LogicalName>
+          <RequiredLevel>None</RequiredLevel>
+          <IsCustomField>1</IsCustomField>
+          <IsCustomizable>1</IsCustomizable>
+          <IsSecured>0</IsSecured>
+          <DisplayMask>ValidForAdvancedFind|ValidForForm|ValidForGrid</DisplayMask>
+          <ImeMode>Auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsLogical>0</IsLogical>
+          <IsPrimaryName>0</IsPrimaryName>
+          <IntroducedVersion>1.1.0.0</IntroducedVersion>
+          <displayname>
+            <displaynames>
+              <displayname description="Sync Status" languagecode="1033" />
+            </displaynames>
+          </displayname>
+          <DescriptionLocalizations>
+            <DescriptionLocalization description="Mirror of the Salesforce-side Sync_Status__c stamped by the Azure Function. Read by the Copilot Studio vendor-Q&amp;A agent as the authoritative current-state of the integration." languagecode="1033" />
+          </DescriptionLocalizations>
+          <optionset>
+            <optionset Name="crfe6_syncstatus">
+              <DisplayName>
+                <LocalizedNames>
+                  <LocalizedName description="Sync Status" languagecode="1033" />
+                </LocalizedNames>
+              </DisplayName>
+              <DescriptionLocalizations>
+                <DescriptionLocalization description="Status of the latest sync attempt against this vendor Account." languagecode="1033" />
+              </DescriptionLocalizations>
+              <displayname>
+                <displaynames>
+                  <displayname description="Sync Status" languagecode="1033" />
+                </displaynames>
+              </displayname>
+              <OptionSetType>picklist</OptionSetType>
+              <IsGlobal>0</IsGlobal>
+              <IntroducedVersion>1.1.0.0</IntroducedVersion>
+              <options>
+                <option value="100000000" ExternalValue="">
+                  <labels>
+                    <label description="Pending" languagecode="1033" />
+                  </labels>
+                  <Descriptions>
+                    <Description description="Initial state — vendor row exists in Salesforce but no sync attempt has completed yet." languagecode="1033" />
+                  </Descriptions>
+                </option>
+                <option value="100000001" ExternalValue="">
+                  <labels>
+                    <label description="Synced" languagecode="1033" />
+                  </labels>
+                  <Descriptions>
+                    <Description description="The Azure Function successfully PATCHed the vendor row into Dataverse." languagecode="1033" />
+                  </Descriptions>
+                </option>
+                <option value="100000002" ExternalValue="">
+                  <labels>
+                    <label description="Error" languagecode="1033" />
+                  </labels>
+                  <Descriptions>
+                    <Description description="The last sync attempt failed (callout exception, non-2xx from Dataverse, or token exchange failure)." languagecode="1033" />
+                  </Descriptions>
+                </option>
+              </options>
+            </optionset>
+          </optionset>
+        </attribute>
+      </attributes>
+      <EntityKeys>
+        <EntityKey>
+          <Name>crfe6_SalesforceIntegrationKey</Name>
+          <LogicalName>crfe6_salesforceintegrationkey</LogicalName>
+          <DisplayName>
+            <LocalizedNames>
+              <LocalizedName description="Salesforce Integration Key" languagecode="1033" />
+            </LocalizedNames>
+          </DisplayName>
+          <attributes>
+            <attribute>crfe6_salesforceid</attribute>
+          </attributes>
+        </EntityKey>
+      </EntityKeys>
+      <IsActivity>0</IsActivity>
+      <IsCustomizable>1</IsCustomizable>
+      <IsBusinessProcessEnabled>0</IsBusinessProcessEnabled>
+      <IsVisibleInMobileClient>1</IsVisibleInMobileClient>
+      <IsFilterPaneEnabled>true</IsFilterPaneEnabled>
+      <CanTriggerWorkflow>1</CanTriggerWorkflow>
+      <IsEnabledForExternalClientSources>0</IsEnabledForExternalClientSources>
+      <Operations>
+        <Create>1</Create>
+        <Update>1</Update>
+        <Delete>1</Delete>
+        <Retrieve>1</Retrieve>
+        <RetrieveMultiple>1</RetrieveMultiple>
+      </Operations>
+      <IntroducedVersion>1.0.0.0</IntroducedVersion>
+      <IsDocumentManagementEnabled>0</IsDocumentManagementEnabled>
+      <IsEnabledForCharts>1</IsEnabledForCharts>
+      <IsEnabledForTrace>0</IsEnabledForTrace>
+      <IsSolutionAware>0</IsSolutionAware>
+      <CanCreateCharts>1</CanCreateCharts>
+    </entity>
+  </EntityInfo>
+  <FormXml>
+    <forms type="main">
+      <form systemformid="b12c8d9f-1111-4321-9abc-def012345670">
+        <IntroducedVersion>1.0.0.0</IntroducedVersion>
+        <FormPresentation>1</FormPresentation>
+        <FormActivationState>1</FormActivationState>
+        <form headercolor="#ffffff" headerbackgroundcolor="#ffffff" showImage="false" maxWidth="1920" relatedEntityCollapsed="false">
+          <tabs>
+            <tab name="general" verticallayout="true" id="{b12c8d9f-1111-4321-9abc-def012345671}" IsUserDefined="0">
+              <labels>
+                <label description="General" languagecode="1033" />
+              </labels>
+              <columns>
+                <column width="100%">
+                  <sections>
+                    <section name="account information" showlabel="true" showbar="true" barcolor="#cccccc" id="{b12c8d9f-1111-4321-9abc-def012345672}" IsUserDefined="0" height="auto" visible="true">
+                      <labels>
+                        <label description="Vendor Information" languagecode="1033" />
+                      </labels>
+                      <rows>
+                        <row>
+                          <cell id="{b12c8d9f-1111-4321-9abc-def012345673}" showlabel="true" locklevel="0">
+                            <labels>
+                              <label description="Account Name" languagecode="1033" />
+                            </labels>
+                            <control id="name" datafieldname="name" classid="{270BD3DB-D9AF-4782-9025-509E2FB51982}" disabled="false" />
+                          </cell>
+                        </row>
+                        <row>
+                          <cell id="{b12c8d9f-1111-4321-9abc-def012345674}" showlabel="true" locklevel="0">
+                            <labels>
+                              <label description="UEN" languagecode="1033" />
+                            </labels>
+                            <control id="crfe6_uen" datafieldname="crfe6_uen" classid="{4273EDBD-AC1D-40d3-9FB2-095C821DC58E}" disabled="false" />
+                          </cell>
+                        </row>
+                        <row>
+                          <cell id="{b12c8d9f-1111-4321-9abc-def012345675}" showlabel="true" locklevel="0">
+                            <labels>
+                              <label description="Salesforce ID" languagecode="1033" />
+                            </labels>
+                            <control id="crfe6_salesforceid" datafieldname="crfe6_salesforceid" classid="{4273EDBD-AC1D-40d3-9FB2-095C821DC58E}" disabled="false" />
+                          </cell>
+                        </row>
+                        <row>
+                          <cell id="{b12c8d9f-1111-4321-9abc-def012345677}" showlabel="true" locklevel="0">
+                            <labels>
+                              <label description="Sync Status" languagecode="1033" />
+                            </labels>
+                            <control id="crfe6_syncstatus" datafieldname="crfe6_syncstatus" classid="{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}" disabled="true" />
+                          </cell>
+                        </row>
+                        <row>
+                          <cell id="{b12c8d9f-1111-4321-9abc-def012345676}" showlabel="true" locklevel="0" rowspan="6" auto="false">
+                            <labels>
+                              <label description="Vendor Validation (Canvas Custom Page)" languagecode="1033" />
+                            </labels>
+                            <control id="crfe6_vendorvalidation" datafieldname="crfe6_vendorvalidation" classid="{9F8F5B3A-E0AB-4B5F-9F1E-7C3B5E0F8B11}" disabled="false">
+                              <parameters>
+                                <AppModule>crfe6_vendorvalidation</AppModule>
+                                <ContextInModelDrivenApp>true</ContextInModelDrivenApp>
+                              </parameters>
+                            </control>
+                          </cell>
+                        </row>
+                      </rows>
+                    </section>
+                  </sections>
+                </column>
+              </columns>
+            </tab>
+          </tabs>
+          <DisplayConditions Order="0" FallbackForm="true" />
+          <Navigation />
+          <formLibraries />
+          <events />
+        </form>
+      </form>
+    </forms>
+  </FormXml>
+  <SavedQueries>
+    <savedqueries>
+      <savedquery>
+        <savedqueryid>{b12c8d9f-2222-4321-9abc-def012345678}</savedqueryid>
+        <IsCustomizable>1</IsCustomizable>
+        <CanBeDeleted>1</CanBeDeleted>
+        <isquickfindquery>0</isquickfindquery>
+        <isprivate>0</isprivate>
+        <isdefault>0</isdefault>
+        <returnedtypecode>1</returnedtypecode>
+        <savedqueryidex xmlns="http://schemas.microsoft.com/crm/2007/WebServices">{b12c8d9f-2222-4321-9abc-def012345678}</savedqueryidex>
+        <LocalizedNames>
+          <LocalizedName description="Pending Salesforce Sync" languagecode="1033" />
+        </LocalizedNames>
+        <Descriptions>
+          <Description description="Vendors recently synced from Salesforce, newest first — drives the ops validation queue." languagecode="1033" />
+        </Descriptions>
+        <columnsetxml>
+          <columnset version="3.0">
+            <column>name</column>
+            <column>crfe6_uen</column>
+            <column>crfe6_salesforceid</column>
+            <column>crfe6_syncstatus</column>
+            <column>createdon</column>
+            <column>accountid</column>
+            <filter type="and">
+              <condition attribute="crfe6_salesforceid" operator="not-null" />
+            </filter>
+            <filter linker="or" type="or" />
+          </columnset>
+        </columnsetxml>
+        <order name="createdon" descending="true" />
+        <layoutxml>
+          <grid name="resultset" object="1" jump="name" select="1" icon="1" preview="1">
+            <row name="result" id="accountid">
+              <cell name="name" width="300" />
+              <cell name="crfe6_uen" width="150" />
+              <cell name="crfe6_salesforceid" width="150" />
+              <cell name="crfe6_syncstatus" width="120" />
+              <cell name="createdon" width="150" />
+            </row>
+          </grid>
+        </layoutxml>
+        <querytype>0</querytype>
+        <fetchxml>
+          <fetch version="1.0" output-format="xml-platform" mapping="logical">
+            <entity name="account">
+              <attribute name="name" />
+              <attribute name="crfe6_uen" />
+              <attribute name="crfe6_salesforceid" />
+              <attribute name="crfe6_syncstatus" />
+              <attribute name="createdon" />
+              <attribute name="accountid" />
+              <order attribute="createdon" descending="true" />
+              <filter type="and">
+                <condition attribute="crfe6_salesforceid" operator="not-null" />
+              </filter>
+            </entity>
+          </fetch>
+        </fetchxml>
+        <IntroducedVersion>1.0.0.0</IntroducedVersion>
+        <gridid>{b12c8d9f-2222-4321-9abc-def012345678}</gridid>
+        <LayoutXml modifier="ok" version="3.0" />
+      </savedquery>
+    </savedqueries>
+  </SavedQueries>
+  <RibbonDiffXml />
+  <Reports />
+  <Icons />
+</Entity>

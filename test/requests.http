@@ -1,0 +1,5 @@
+POST http://localhost:7071/runtime/webhooks/EventGrid?functionName=SalesforceCDCWebhook
+Content-Type: application/json
+aeg-event-type: Notification
+
+< ./mock-salesforce-cdc-event.json

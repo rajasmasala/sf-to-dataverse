@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>60.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Vendor Sync Dashboard</masterLabel>
+    <description>Back-office dashboard showing vendor Accounts and their Azure/Dataverse sync status, plus a tile of failed syncs that need operator attention.</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__Tab</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AppPage,lightning__HomePage">
+            <property name="recentLimit" type="Integer" default="50" label="Recent vendors row limit" />
+            <property name="failedLimit" type="Integer" default="50" label="Failed syncs row limit" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

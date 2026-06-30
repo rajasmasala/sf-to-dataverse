@@ -1,0 +1,257 @@
+name: SF to Dataverse - Parallel CI/CD
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/salesforce/**'
+      - 'src/powerplatform/**'
+      - 'src/azure/**'
+      - 'config/project-scratch-def.json'
+      - 'sfdx-project.json'
+      - '.github/workflows/sf-to-dataverse-ci.yml'
+
+# Cancel in-flight runs when a PR is updated; don't queue duplicates.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# dorny/paths-filter needs to read PR files via the GitHub API.
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  # Detect which platform areas changed so we only run the relevant validations.
+  detect-changes:
+    name: Detect Changed Platforms
+    runs-on: ubuntu-latest
+    outputs:
+      salesforce: ${{ steps.filter.outputs.salesforce }}
+      powerplatform: ${{ steps.filter.outputs.powerplatform }}
+      azure: ${{ steps.filter.outputs.azure }}
+    steps:
+      - uses: actions/checkout@v7
+      # dorny/paths-filter v3.0.3
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d
+        id: filter
+        with:
+          filters: |
+            salesforce:
+              - 'src/salesforce/**'
+              - 'config/project-scratch-def.json'
+              - 'sfdx-project.json'
+            powerplatform:
+              - 'src/powerplatform/**'
+            azure:
+              - 'src/azure/**'
+
+  test-azure-function:
+    name: Azure Function Unit Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.azure == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          # Match the deployed Azure Functions runtime (Windows Consumption, Node 22).
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: 'src/azure/package-lock.json'
+
+      - name: Install Dependencies
+        working-directory: src/azure
+        run: npm ci
+
+      - name: Run Unit Tests
+        working-directory: src/azure
+        run: npm test
+
+  test-salesforce-lwc:
+    name: Salesforce LWC Jest Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.salesforce == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      # sfdx-lwc-jest runs from the repo root (where sfdx-project.json lives) and is
+      # explicitly scoped to ignore src/azure (its LWC-only Babel preset can't transform
+      # the Azure Functions tests). This is the only place the LWC tests run in CI.
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run LWC Unit Tests
+        run: npm run test:unit
+
+  validate-salesforce:
+    name: Salesforce DX Dry-Run & Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.salesforce == 'true'
+    runs-on: ubuntu-latest
+    env:
+      # Graceful skip, mirroring the Power Platform job below: without a Dev Hub
+      # auth URL the scratch-org deploy can't run, so it is skipped (a notice, not
+      # a failure). The LWC Jest job remains the always-on Salesforce gate, and
+      # Apex is validated locally in a scratch org on demand (see README → CI/CD)
+      # until SFDX_AUTH_URL is configured.
+      SFDX_CONFIGURED: ${{ secrets.SFDX_AUTH_URL != '' && 'true' || 'false' }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Report Dev Hub Secret Status
+        run: |
+          if [ "${SFDX_CONFIGURED}" = "true" ]; then
+            echo "::notice::SFDX_AUTH_URL is configured; running scratch-org deploy + RunLocalTests."
+          else
+            echo "::notice::SFDX_AUTH_URL is not configured; skipping the scratch-org deploy + Apex tests. The LWC Jest job is the active Salesforce CI gate; Apex is validated locally in a scratch org on demand. See README → CI/CD."
+          fi
+
+      - name: Setup Node.js
+        if: ${{ env.SFDX_CONFIGURED == 'true' }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install Salesforce CLI
+        if: ${{ env.SFDX_CONFIGURED == 'true' }}
+        run: npm install -g @salesforce/cli
+
+      - name: Authenticate to Salesforce Dev Hub
+        if: ${{ env.SFDX_CONFIGURED == 'true' }}
+        env:
+          SFDX_AUTH_URL: ${{ secrets.SFDX_AUTH_URL }}
+        run: |
+          echo "$SFDX_AUTH_URL" > sfdx_auth.txt
+          sf org login sfdx-url -f sfdx_auth.txt --set-default-dev-hub --alias devhub
+
+      - name: Clean Up Stale Scratch Orgs (free quota)
+        if: ${{ env.SFDX_CONFIGURED == 'true' }}
+        continue-on-error: true
+        run: |
+          # Delete ALL active scratch orgs on the Dev Hub before this run.
+          # This prevents CI flakiness from quota exhaustion when previous runs
+          # created scratch orgs that didn't get cleaned up (cancelled runs, etc).
+          # CI scratch orgs are disposable by definition.
+          #
+          # NOTE: ActiveScratchOrg is the consumer-side object that exposes only
+          # the username of the scratch org user, but the field that survives
+          # for deletion purposes is on ScratchOrgInfo (the signup record).
+          # We query ScratchOrgInfo WHERE Status='Active' and delete by Id.
+          echo "Active scratch orgs before cleanup:"
+          sf data query --target-org devhub --query "SELECT Id, SignupUsername, Status FROM ScratchOrgInfo WHERE Status='Active'" 2>/dev/null || true
+          for orginfo_id in $(sf data query --target-org devhub --query "SELECT Id FROM ScratchOrgInfo WHERE Status='Active'" --json 2>/dev/null | jq -r '.result.records[].Id // empty' 2>/dev/null); do
+            echo "  - deleting ScratchOrgInfo $orginfo_id"
+            sf data delete record --target-org devhub --sobject ScratchOrgInfo --record-id "$orginfo_id" 2>/dev/null || true
+          done
+
+      - name: Create Scratch Org
+        if: ${{ env.SFDX_CONFIGURED == 'true' }}
+        run: sf org create scratch -f config/project-scratch-def.json -a pr-scratch-org -y 1 -v devhub --wait 10
+
+      - name: Deploy Source & Run Apex Tests
+        if: ${{ env.SFDX_CONFIGURED == 'true' }}
+        run: sf project deploy start --target-org pr-scratch-org --test-level RunLocalTests --wait 10
+
+      - name: Delete Scratch Org (always)
+        if: ${{ always() && env.SFDX_CONFIGURED == 'true' }}
+        run: sf org delete scratch -o pr-scratch-org --no-prompt || true
+
+  validate-power-platform:
+    name: Power Platform PAC CLI Validation
+    needs: detect-changes
+    if: needs.detect-changes.outputs.powerplatform == 'true'
+    runs-on: windows-latest
+    env:
+      DATAVERSE_CONFIGURED: ${{ (secrets.DATAVERSE_ENV_URL != '' && secrets.DATAVERSE_APP_ID != '' && secrets.DATAVERSE_CLIENT_SECRET != '' && secrets.DATAVERSE_TENANT_ID != '') && 'true' || 'false' }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Install Power Platform CLI Tools
+        # microsoft/powerplatform-actions/actions-install v1.9.2
+        uses: microsoft/powerplatform-actions/actions-install@0e44beb5424af932af47250a2568eba4c259e3d8
+
+      - name: Pack Unmanaged Solution
+        # microsoft/powerplatform-actions/pack-solution v1.9.2
+        uses: microsoft/powerplatform-actions/pack-solution@0e44beb5424af932af47250a2568eba4c259e3d8
+        with:
+          solution-folder: 'src/powerplatform/sf-to-dataverse'
+          solution-file: 'out/UniversalFabric.zip'
+          solution-type: 'Unmanaged'
+
+      - name: Report Dataverse Secret Status
+        run: |
+          if ("${{ env.DATAVERSE_CONFIGURED }}" -eq "true") {
+            Write-Host "::notice::Dataverse secrets detected; Solution Checker will run."
+          } else {
+            Write-Host "::notice::Dataverse secrets (DATAVERSE_ENV_URL, DATAVERSE_APP_ID, DATAVERSE_CLIENT_SECRET, DATAVERSE_TENANT_ID) are not configured; skipping who-am-i and Solution Checker. Pack validation is the authoritative CI gate."
+          }
+
+      - name: Authenticate to Dataverse (Service Principal)
+        if: ${{ env.DATAVERSE_CONFIGURED == 'true' }}
+        # microsoft/powerplatform-actions/who-am-i v1.9.2
+        uses: microsoft/powerplatform-actions/who-am-i@0e44beb5424af932af47250a2568eba4c259e3d8
+        with:
+          environment-url: ${{ secrets.DATAVERSE_ENV_URL }}
+          app-id: ${{ secrets.DATAVERSE_APP_ID }}
+          client-secret: ${{ secrets.DATAVERSE_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.DATAVERSE_TENANT_ID }}
+
+      - name: Solution Checker Validation
+        if: ${{ env.DATAVERSE_CONFIGURED == 'true' }}
+        # microsoft/powerplatform-actions/check-solution v1.9.2
+        uses: microsoft/powerplatform-actions/check-solution@0e44beb5424af932af47250a2568eba4c259e3d8
+        with:
+          environment-url: ${{ secrets.DATAVERSE_ENV_URL }}
+          app-id: ${{ secrets.DATAVERSE_APP_ID }}
+          client-secret: ${{ secrets.DATAVERSE_CLIENT_SECRET }}
+          tenant-id: ${{ secrets.DATAVERSE_TENANT_ID }}
+          path: 'out/UniversalFabric.zip'
+          geo: 'UnitedStates'
+          fail-on-analysis-error: true
+
+      - name: Upload Solution Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: UniversalFabric-${{ github.run_id }}
+          path: 'out/UniversalFabric.zip'
+          if-no-files-found: error
+          retention-days: 7
+
+  test-powerplatform-plugin:
+    name: Power Platform Plugin Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.powerplatform == 'true'
+    # The plugin targets net48 (.NET Framework), which is Windows-only.
+    # On Linux the test host would look for a Mono runtime that does not
+    # exist on the GitHub-hosted ubuntu runners.
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore + Test
+        working-directory: src/powerplatform/plugins
+        run: |
+          dotnet restore UniversalFabric.Plugins.sln
+          # GitHubActionsTestLogger v2.x expects friendly name 'GitHubActions' (case-sensitive).
+          dotnet test UniversalFabric.Plugins.sln -c Release --logger "GitHubActions;verbosity=normal"

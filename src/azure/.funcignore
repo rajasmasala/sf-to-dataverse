@@ -1,0 +1,15 @@
+﻿node_modules/jest*
+node_modules/@types
+node_modules/typescript
+node_modules/.cache
+.local
+tests
+__tests__
+*.test.js
+*.spec.js
+coverage
+node_modules/azure-functions-core-tools
+demo-bridge.js
+_*.js
+.azurite
+local.settings.json

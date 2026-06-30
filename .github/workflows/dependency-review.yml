@@ -1,0 +1,41 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/azure/package.json'
+      - 'src/azure/package-lock.json'
+      - '.github/workflows/dependency-review.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    name: Scan Dependency Changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          # Match the deployed Azure Functions runtime (Node 22).
+          node-version: '22'
+
+      - name: npm audit (enforcement)
+        working-directory: src/azure
+        run: npm audit --omit=dev --audit-level=low
+
+      - name: Dependency Review (advisory)
+        uses: actions/dependency-review-action@v5
+        continue-on-error: true
+        with:
+          fail-on-severity: low
+          allow-licenses: >-
+            MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC,
+            0BSD, Unlicense, CC0-1.0, Python-2.0
+          comment-summary-in-pr: on-failure

@@ -1,0 +1,92 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "crfe6_sharedcommondataserviceforapps"
+        }
+      },
+      "shared_office365_1": {
+        "runtimeSource": "embedded",
+        "connection": {
+          "connectionReferenceLogicalName": "crfe6_sharedoffice365"
+        }
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "triggers": {
+        "When_a_row_is_added_modified_or_deleted": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "CreateListOnEntityChangeTrigger"
+            },
+            "parameters": {
+              "dataEnvironment": "Default",
+              "entityName": "accounts",
+              "changeTypes": ["Create"],
+              "scope": "Organization",
+              "filterExpression": "crfe6_salesforceid ne null and crfe6_sync_notes eq null"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "actions": {
+        "Get_record": {
+          "runAfter": {},
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_commondataserviceforapps",
+              "operationId": "GetItem"
+            },
+            "parameters": {
+              "entityName": "accounts",
+              "recordId": "@triggerOutputs()?['body/accountid']",
+              "$select": "name,crfe6_uen,crfe6_salesforceid"
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        },
+        "Send_approval_email": {
+          "runAfter": {
+            "Get_record": ["Succeeded"]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "host": {
+              "connectionName": "shared_office365",
+              "operationId": "SendEmailV2"
+            },
+            "parameters": {
+              "to": "@parameters('ApproverEmail')",
+              "subject": "Vendor pending validation: @{outputs('Get_record')?['body/name']}",
+              "body": "Vendor pending validation — please review in the Vendor Onboarding Hub."
+            },
+            "authentication": "@parameters('$authentication')"
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "parameters": {
+      "$authentication": {
+        "type": "Object",
+        "metadata": {
+          "description": "Authentication for the Dataverse and Office 365 connectors"
+        }
+      },
+      "ApproverEmail": {
+        "type": "String",
+        "metadata": {
+          "description": "Ops analyst distribution list for pending-vendor approvals"
+        }
+      }
+    }
+  }
+}

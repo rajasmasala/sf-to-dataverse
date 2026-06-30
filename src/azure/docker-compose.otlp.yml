@@ -1,0 +1,30 @@
+# docker-compose.otlp.yml
+#
+# Boots Jaeger all-in-one for local OpenTelemetry trace viewing from the
+# Azure Function. OTLP HTTP endpoint is on :4318, Jaeger UI on :16686.
+#
+# Usage:
+#   docker compose -f docker-compose.otlp.yml up
+#   # In another terminal, with OTEL_EXPORTER_OTLP_ENDPOINT set in local.settings.json:
+#   #   func start
+#   # Then open http://localhost:16686 and select service
+#   #   "sf-to-dataverse-salesforce-cdc"
+#
+# Tear down with: docker compose -f docker-compose.otlp.yml down
+
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: sf-to-dataverse-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"   # Jaeger UI
+      - "4318:4318"     # OTLP HTTP (used by exporter-trace-otlp-http)
+      - "4317:4317"     # OTLP gRPC (used by exporter-trace-otlp-proto if you swap exporters)
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:14269/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

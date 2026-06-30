@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- Plugin assemblies are loaded by the Dataverse sandbox worker which
+         resolves its own copy of Microsoft.Xrm.Sdk — do not ship the framework
+         assemblies side-by-side with the plugin. CopyLocalLockFileAssemblies
+         above is false for that reason. -->
+
+    <RootNamespace>UniversalFabric.Plugins</RootNamespace>
+    <AssemblyName>UniversalFabric.Plugins</AssemblyName>
+    <Version>1.0.0.0</Version>
+    <Description>Dataverse pre-operation plugin that stamps crfe6_lastmodifiedbyintegration_at and crfe6_sync_notes on Account updates from the SF-to-Dataverse integration.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CrmSdk.CoreAssemblies" Version="9.0.2.60" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="UniversalFabric.Plugins.Tests" />
+  </ItemGroup>
+
+</Project>

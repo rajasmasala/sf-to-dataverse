@@ -1,0 +1,9 @@
+{
+  "orgName": "SF to Dataverse PR Org",
+  "edition": "Developer",
+  "features": ["EnableSetPasswordInApi", "MultiCurrency"],
+  "settings": {
+    "lightningExperienceSettings": {"enableS1DesktopEnabled": true},
+    "mobileSettings": {"enableS1EncryptedStoragePref2": false}
+  }
+}
