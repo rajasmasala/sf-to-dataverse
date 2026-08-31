@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x",
-    "jest": "^30.4.2"
+    "jest": "^30.5.0"
   },
   "overrides": {
     "js-yaml": "^4.1.2"
